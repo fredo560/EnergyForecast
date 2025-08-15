@@ -11,5 +11,6 @@ dependencies:
   - pip
   - pip:
       - gridstatus==0.29.1
-      - gridstatusio>=0.14.0
+      - gridstatusio==0.14.0
+      - termcolor==1.1.0
       - yfinance

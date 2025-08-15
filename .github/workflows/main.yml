@@ -53,9 +53,10 @@ jobs:
       # Create the environment only if not cached
       - name: Create Conda environment (if needed)
         run: |
-          if not exist C:\Miniconda\envs\myenv (
+          if (-Not (Test-Path "C:\Miniconda\envs\myenv")) {
             conda env create --file environment.yml --name myenv
-          )
+          }
+
 
       # Run your Python script
       - name: Run Python script

@@ -30,4 +30,4 @@ jobs:
       - name: Run Python script
         shell: bash
         run: |
-          conda run -n myenv python your_script.py
+          conda run -n myenv python mainPipe.py

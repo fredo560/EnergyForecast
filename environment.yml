@@ -7,7 +7,6 @@ dependencies:
   - pandas
   - numpy
   - requests
-  - warnings
   - pytz
   - pip
   - pip:

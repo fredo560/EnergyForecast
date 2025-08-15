@@ -28,6 +28,4 @@ jobs:
 
       # 3. Run your Python script
       - name: Run Python script
-        shell: bash
-        run: |
-          conda run -n myenv python mainPipe.py
+        run: conda run -n myenv python mainPipe.py

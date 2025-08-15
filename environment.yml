@@ -1,0 +1,10 @@
+name: myenv
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pandas
+  - numpy
+  - requests
+
+# will need to update this

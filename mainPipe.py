@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore")
+
 import gridstatus
 import pandas as pd
 from datetime import datetime, date, timedelta
@@ -75,4 +78,5 @@ print("df_forecast columns:",df_forecast.columns)
 # Save the dataframes to CSV files
 df_past.to_csv("df_past.csv", index=False)
 df_forecast.to_csv("df_forecast.csv", index=False)
+
 print("Data saved to df_past.csv and df_forecast.csv")

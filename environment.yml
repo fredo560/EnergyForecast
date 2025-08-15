@@ -6,5 +6,9 @@ dependencies:
   - pandas
   - numpy
   - requests
-
-# will need to update this
+  - pytz
+  - pip
+  - pip:
+      - gridstatus
+      - gridstatusio
+      - yfinance

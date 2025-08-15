@@ -11,5 +11,5 @@ dependencies:
   - pip
   - pip:
       - gridstatus
-      - gridstatusio
+      - gridstatusio>=0.14.0
       - yfinance

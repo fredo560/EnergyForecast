@@ -15,17 +15,42 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Set up Miniconda
+     name: Daily Conda Job
+
+on:
+  schedule:
+    # Runs daily at 11:30 PM UTC
+    - cron: '30 4 * * *'
+  workflow_dispatch: # allows manual triggering
+
+jobs:
+  run-script:
+    runs-on: windows-latest
+
+    steps:
+      # 1. Checkout your code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      
+      # Install Miniconda
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: myenv
           python-version: 3.11
-          channels: conda-forge
-          environment-file: environment.yml
+          channels: conda-forge,defaults
           auto-activate-base: false
+          miniforge-version: latest  # keeps your conda fresh
 
+      # Explicitly add defaults channel to avoid warning
+      - name: Configure Conda channels
+        run: conda config --add channels defaults
 
-      # 3. Run your Python script
+      # Create environment using new syntax
+      - name: Create environment from file
+        run: conda env create --file environment.yml --name myenv --force
+
+      # Run the script inside environment
       - name: Run Python script
         run: conda run -n myenv python mainPipe.py

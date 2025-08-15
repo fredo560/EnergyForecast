@@ -10,6 +10,6 @@ dependencies:
   - pytz
   - pip
   - pip:
-      - gridstatus
+      - gridstatus==0.30.1
       - gridstatusio>=0.14.0
       - yfinance

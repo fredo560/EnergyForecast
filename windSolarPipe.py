@@ -1,10 +1,12 @@
 from gridstatusio import GridStatusClient
 import pandas as pd
 from datetime import date, timedelta
+import pytz
 
 # this one works and gets the day prior and up to the recent hour of today
 # and the next 7 days forecast
 
+houston_tz = pytz.timezone('America/Chicago')
 
 def fetch_wind_solar():
     start_date = str(date.today() - timedelta(days=1))
@@ -22,10 +24,11 @@ def fetch_wind_solar():
         start=start_date,
         end=end_date,
         publish_time="latest",
-        timezone="market",
+        #timezone="market",
     )
-
-    df['datetime'] = pd.to_datetime(df['interval_start_local'])
+    print(df.head(24))
+    print(df.columns)
+    df['datetime'] = pd.to_datetime(df['interval_start_utc'],utc=True).dt.tz_convert(houston_tz).dt.tz_localize(None)  # Convert to Houston local time
     df["date"] = df["datetime"].dt.floor("h")
 
     # Group by hour and calculate averages
@@ -55,10 +58,10 @@ def fetch_wind_solar_forecast(days_ahead=8):
         start=date.today(),
         end=endEndDate,
         publish_time="latest",
-        timezone="market",
+        #timezone="market",
         )
 
-    df['date'] = pd.to_datetime(df['interval_start_local']).dt.floor("h").dt.strftime('%Y-%m-%d %H:%M:%S')
+    df['date'] = pd.to_datetime(df['interval_start_utc'],utc=True).dt.tz_convert(houston_tz).dt.floor("h").dt.tz_localize(None).dt.strftime('%Y-%m-%d %H:%M:%S')
     df = df[['date', 'wind_forecast_mw', 'solar_forecast_mw']]
     df = df.dropna()
     return df

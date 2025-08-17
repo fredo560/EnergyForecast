@@ -46,4 +46,7 @@ def get_weather_data():
 df1,df2 = get_weather_data()
 
 print(df1.head(48))
+
 print(df2.tail(48))
+
+print("Finished weather data fetch")

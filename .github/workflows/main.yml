@@ -1,4 +1,4 @@
-name: Run Main Pipeline
+name: Daily Conda Job
 
 on:
   schedule:

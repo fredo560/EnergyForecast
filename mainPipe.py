@@ -20,15 +20,19 @@ df3, df4 = fetch_lmp_prices()
 df5, df6 = fetch_windSolar_real_and_forecast()
 df7, df8 = get_weather_data()
 
+print("Data fetched successfully from all sources.")
 
 def standardize_date_column(df):
-    df["date"] = pd.to_datetime(df["date"], errors="coerce")  # convert to datetime, drop errors if any
-    df["date"] = df["date"].dt.tz_localize(None)              # remove timezone
-    df["date"] = df["date"].dt.floor("h")                     # round to hour
+    houston_tz = pytz.timezone('America/Chicago')
+
+    df["date"] = pd.to_datetime(df["date"], errors="coerce",utc=True)  # convert to datetime, drop errors if any
+    df["date"] = df["date"].dt.tz_convert(houston_tz).dt.floor("h").dt.tz_localize(None)              # remove timezone                   # round to hour
     return df
 
 for df in [df1, df2, df3, df4, df5, df6, df7, df8]:
     standardize_date_column(df)
+
+print("Date columns standardized.")
 
 # Merge past data
 df_past = df1.merge(df3, on="date", how="inner")
@@ -40,9 +44,13 @@ df_forecast = df2.merge(df4, on="date", how="inner")
 df_forecast = df_forecast.merge(df6, on="date", how="inner")
 df_forecast = df_forecast.merge(df8, on="date", how="inner")
 
+print("Data merged successfully.")
+
 # Sort by date
 df_past = df_past.sort_values("date").reset_index(drop=True)
 df_forecast = df_forecast.sort_values("date").reset_index(drop=True)
+
+print("Data sorted by date.")
 
 print("Past DataFrame:")
 print(df_past.head(24))
@@ -72,11 +80,10 @@ print_date_range(df8, "df8")
 print_date_range(df_past, "df_past")
 print_date_range(df_forecast, "df_forecast")
 
-print("df_past columns:",df_past.columns)
-print("df_forecast columns:",df_forecast.columns)
+print("df_past columns:",df_past.columns.tolist())
+print("df_forecast columns:",df_forecast.columns.tolist())
 
 # Save the dataframes to CSV files
 df_past.to_csv("df_past.csv", index=False)
 df_forecast.to_csv("df_forecast.csv", index=False)
-
 print("Data saved to df_past.csv and df_forecast.csv")

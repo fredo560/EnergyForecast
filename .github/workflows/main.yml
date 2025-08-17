@@ -14,50 +14,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Cache Conda's package downloads
-      - name: Cache Conda package cache
-        uses: actions/cache@v4
-        with:
-          path: C:\Miniconda\pkgs
-          key: conda-pkgs-${{ runner.os }}-${{ hashFiles('environment.yml') }}
-          restore-keys: |
-            conda-pkgs-${{ runner.os }}-
-
-      # Cache the Conda environment itself
-      - name: Cache Conda environment
-        uses: actions/cache@v4
-        with:
-          path: C:\Miniconda\envs\myenv
-          key: conda-env-${{ runner.os }}-${{ hashFiles('environment.yml') }}
-          restore-keys: |
-            conda-env-${{ runner.os }}-
-
-      # Install Miniconda
-      - name: Set up Miniconda
+      # Setup Miniconda and activate environment from environment.yml
+      - name: Setup Conda and activate environment
         uses: conda-incubator/setup-miniconda@v3
         with:
+          auto-update-conda: true
+          environment-file: environment.yml
           activate-environment: myenv
-          python-version: 3.11
+          python-version: '3.11'
           channels: conda-forge,defaults
           auto-activate-base: false
           miniforge-version: latest
+          use-only-miniforge: true
 
-      # Configure Conda channels explicitly
-      - name: Configure Conda channels
-        run: conda config --add channels defaults
-
-      # Update Conda to latest version (future-proof)
-      - name: Update Conda
-        run: conda update -n base -c defaults conda -y
-
-      # Create the environment only if not cached
-      - name: Create Conda environment (if needed)
-        run: |
-          if (-Not (Test-Path "C:\Miniconda\envs\myenv")) {
-            conda env create --file environment.yml --name myenv
-          }
-
-
-      # Run your Python script
       - name: Run Python script
-        run: conda run -n myenv python mainPipe.py
+        # The 'conda run' command is no longer needed because the environment is already activated
+        run: python mainPipe.py

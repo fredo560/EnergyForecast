@@ -1,6 +1,7 @@
 from gridstatusio import GridStatusClient
 from datetime import datetime, date, timedelta
 import pandas as pd
+import time
 
 # meant for version 0.5.6 now so it will work with gridstatus library
 # removed timezone which was bottlenecking the code
@@ -15,6 +16,7 @@ def getErcotLoadForecast():
     end_date = start_date + timedelta(days=6)
 
     # Initialize the client
+    time.sleep(1)
     client = GridStatusClient("8d79158749f44daba78482b30626f617")
 
     # Fetch data as pandas DataFrame
@@ -57,3 +59,4 @@ print("Printing df1 (past/current load data):")
 print(df1.tail(48))
 print("\nPrinting df2 (future load forecast data):")
 print(df2.tail(48))
+

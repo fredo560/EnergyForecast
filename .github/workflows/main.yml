@@ -1,3 +1,5 @@
+# Fixes your workflow to manually cache the Conda environment.
+
 name: Daily Conda Job
 
 on:
@@ -14,50 +16,42 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Cache Conda's package downloads
-      - name: Cache Conda package cache
-        uses: actions/cache@v4
+      # Manually set up Conda and its location on the runner.
+      - name: Set up Conda on runner
+        # Use an action that just installs Conda without managing environments.
+        uses: mamba-org/setup-micromamba@v1
         with:
-          path: C:\Miniconda\pkgs
-          key: conda-pkgs-${{ runner.os }}-${{ hashFiles('environment.yml') }}
-          restore-keys: |
-            conda-pkgs-${{ runner.os }}-
+          micromamba-version: latest
+          init-shell: bash
+          create-args: >
+            python=3.11
+            -c conda-forge
 
-      # Cache the Conda environment itself
+      # --- Caching Steps ---
+      # This block handles caching the Conda environment directory.
+      # The 'key' uses the hash of environment.yml to invalidate the cache
+      # if dependencies change.
       - name: Cache Conda environment
+        id: cache-conda
         uses: actions/cache@v4
         with:
-          path: C:\Miniconda\envs\myenv
-          key: conda-env-${{ runner.os }}-${{ hashFiles('environment.yml') }}
+          path: D:\a\conda-daily-job\conda-daily-job\.micromamba\envs\myenv
+          key: ${{ runner.os }}-conda-env-${{ hashFiles('environment.yml') }}
           restore-keys: |
-            conda-env-${{ runner.os }}-
+            ${{ runner.os }}-conda-env-
 
-      # Install Miniconda
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          activate-environment: myenv
-          python-version: 3.11
-          channels: conda-forge,defaults
-          auto-activate-base: false
-          miniforge-version: latest
-
-      # Configure Conda channels explicitly
-      - name: Configure Conda channels
-        run: conda config --add channels defaults
-
-      # Update Conda to latest version (future-proof)
-      - name: Update Conda
-        run: conda update -n base -c defaults conda -y
-
-      # Create the environment only if not cached
-      - name: Create Conda environment (if needed)
+      # This is the conditional step to create the environment.
+      # It runs only if the cache was a miss (no existing environment found).
+      - name: Create Conda environment
+        if: steps.cache-conda.outputs.cache-hit != 'true'
+        shell: bash
         run: |
-          if (-Not (Test-Path "C:\Miniconda\envs\myenv")) {
-            conda env create --file environment.yml --name myenv
-          }
+          micromamba env create -f environment.yml -n myenv
 
-
-      # Run your Python script
-      - name: Run Python script
-        run: conda run -n myenv python mainPipe.py
+      # --- Run Script ---
+      # Run your Python script using the activated environment.
+      #- name: Run Python script
+      #  shell: bash
+      #  run: |
+       #   micromamba activate myenv
+        #  python mainPipe.py

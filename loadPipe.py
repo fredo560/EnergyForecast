@@ -2,7 +2,8 @@ from gridstatusio import GridStatusClient
 from datetime import datetime, date, timedelta
 import pandas as pd
 
-
+# meant for version 0.5.6 now so it will work with gridstatus library
+# removed timezone which was bottlenecking the code
 # this one is done and gets 6 days advanced as well
 
 def getErcotLoadForecast():
@@ -22,11 +23,16 @@ def getErcotLoadForecast():
         start=start_date.strftime("%Y-%m-%d"),
         end=end_date.strftime("%Y-%m-%d"),
         publish_time="latest",
-        timezone="market",
+        #timezone="market",
     )
 
     df = df[["interval_start_utc", "interval_end_utc", "coast", "system_total"]]
-    df["date"] = pd.to_datetime(df["interval_start_utc"]).dt.tz_localize(None)
+    #df["date"] = pd.to_datetime(df["interval_start_utc"]).dt.tz_localize(None)
+    df["date"] = (
+        pd.to_datetime(df["interval_start_utc"], utc=True)
+        .dt.tz_convert("America/Chicago")   # Houston local time
+        .dt.tz_localize(None)               # remove tzinfo for cleaner output
+    )
     df = df.drop(columns=["interval_start_utc", "interval_end_utc"])
     df = df.dropna()
 

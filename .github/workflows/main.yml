@@ -27,6 +27,6 @@ jobs:
           miniforge-version: latest
           use-only-miniforge: true
 
-     # - name: Run Python script
+      - name: Run Python script
         # The 'conda run' command is no longer needed because the environment is already activated
-        #run: python mainPipe.py
+        run: python mainPipe.py

@@ -2,10 +2,11 @@ from gridstatusio import GridStatusClient
 import pandas as pd
 from datetime import date, timedelta
 import pytz
+import time
 
 # this one works and gets the day prior and up to the recent hour of today
 # and the next 7 days forecast
-
+print("Fetching wind and solar data...")
 houston_tz = pytz.timezone('America/Chicago')
 
 def fetch_wind_solar():
@@ -70,6 +71,7 @@ def fetch_windSolar_real_and_forecast():
     ''' Fetches both real and forecasted wind and solar data.
     '''
     df1 = fetch_wind_solar()
+    time.sleep(1)
     df2 = fetch_wind_solar_forecast()
 
 

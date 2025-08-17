@@ -23,9 +23,6 @@ jobs:
         with:
           micromamba-version: latest
           init-shell: bash
-          create-args: >
-            python=3.11
-            -c conda-forge
 
       # --- Caching Steps ---
       # This block handles caching the Conda environment directory.
@@ -35,7 +32,7 @@ jobs:
         id: cache-conda
         uses: actions/cache@v4
         with:
-          path: D:\a\conda-daily-job\conda-daily-job\.micromamba\envs\myenv
+          path: D:\a\Daily-Conda-Job\Daily-Conda-Job\.micromamba\envs\myenv
           key: ${{ runner.os }}-conda-env-${{ hashFiles('environment.yml') }}
           restore-keys: |
             ${{ runner.os }}-conda-env-
@@ -52,6 +49,6 @@ jobs:
       # Run your Python script using the activated environment.
       #- name: Run Python script
       #  shell: bash
-      #  run: |
+       # run: |
        #   micromamba activate myenv
         #  python mainPipe.py

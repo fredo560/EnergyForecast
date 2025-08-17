@@ -23,6 +23,8 @@ jobs:
         with:
           micromamba-version: latest
           init-shell: bash
+          # Use a predictable path within the workspace for caching.
+          micromamba-base-path: ${{ github.workspace }}/.micromamba
 
       # --- Caching Steps ---
       # This block handles caching the Conda environment directory.
@@ -32,7 +34,8 @@ jobs:
         id: cache-conda
         uses: actions/cache@v4
         with:
-          path: D:\a\Daily-Conda-Job\Daily-Conda-Job\.micromamba\envs\myenv
+          # The path now points to the new, predictable location.
+          path: ${{ github.workspace }}/.micromamba/envs/myenv
           key: ${{ runner.os }}-conda-env-${{ hashFiles('environment.yml') }}
           restore-keys: |
             ${{ runner.os }}-conda-env-
@@ -48,7 +51,7 @@ jobs:
       # --- Run Script ---
       # Run your Python script using the activated environment.
       #- name: Run Python script
-      #  shell: bash
+       # shell: bash
        # run: |
-       #   micromamba activate myenv
+         # micromamba activate myenv
         #  python mainPipe.py

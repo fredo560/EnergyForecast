@@ -3,6 +3,8 @@ import pandas as pd
 import json 
 from datetime import datetime, date, timedelta
 
+print("Fetching weather data")
+
 # this one is done, gets todays weather and the next 7 days forecast in seperate DFs
 
 # https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/houston/next7days?unitGroup=us&elements=datetime%2CdatetimeEpoch%2Ctemp%2Cdew%2Chumidity%2Cprecip%2Csnow%2Cwindspeedmean%2Cpressure%2Ccloudcover%2Cvisibility%2Csolarradiation&include=hours&key=B8HMZFWVSYTM4U5Q7AVQ7UL83&contentType=json
@@ -16,6 +18,7 @@ def get_weather_data():
     response = requests.get(url)
     data = response.json()
 
+    print("Successfully received weather data")
     hourly_data = []
     for day in data.get("days", []):
         for hour in day.get("hours", []):
@@ -50,3 +53,4 @@ print(df1.head(48))
 print(df2.tail(48))
 
 print("Finished weather data fetch")
+

@@ -30,8 +30,8 @@ jobs:
           use-only-tar-bz2: true # IMPORTANT for cache re-use!
           auto-update-conda: true
 
-     # - name: Run pipeline
-      #  shell: bash -l {0}
-      #  run: |
-       #   conda activate myenv
-       #   python mainPipe.py
+      - name: Run pipeline
+        shell: bash -l {0}
+        run: |
+          conda activate myenv
+          python mainPipe.py

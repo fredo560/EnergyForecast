@@ -2,6 +2,7 @@ from gridstatusio import GridStatusClient
 from datetime import datetime, date, timedelta
 import pandas as pd
 import time
+import pytz  # Import for timezone handling
 
 # meant for version 0.5.6 now so it will work with gridstatus library
 # removed timezone which was bottlenecking the code
@@ -12,7 +13,10 @@ def getErcotLoadForecast():
     '''
 
     # Use today's date
-    start_date = date.today() - timedelta(days=1)
+    houston_tz = pytz.timezone('America/Chicago')
+    now = datetime.now(houston_tz)
+    today = now.date()
+    start_date = today - timedelta(days=1)
     end_date = start_date + timedelta(days=6)
 
     # Initialize the client
@@ -33,13 +37,13 @@ def getErcotLoadForecast():
     df["date"] = (
         pd.to_datetime(df["interval_start_utc"], utc=True)
         .dt.tz_convert("America/Chicago")   # Houston local time
-        .dt.tz_localize(None)               # remove tzinfo for cleaner output
+        #.dt.tz_localize(None)               # remove tzinfo for cleaner output
     )
     df = df.drop(columns=["interval_start_utc", "interval_end_utc"])
     df = df.dropna()
 
     # Get current datetime
-    now = datetime.now()
+    #now = datetime.now()
 
     # Split the data
     df1 = df[df["date"] <= now].copy()
@@ -58,5 +62,5 @@ df1, df2 = getErcotLoadForecast()
 print("Printing df1 (past/current load data):")
 print(df1.tail(48))
 print("\nPrinting df2 (future load forecast data):")
-print(df2.tail(48))
-
+print(df2.head(24))
+print(df2.tail(24))

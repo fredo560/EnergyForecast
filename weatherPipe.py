@@ -2,8 +2,9 @@ import requests
 import pandas as pd
 import json 
 from datetime import datetime, date, timedelta
+import pytz
 
-print("Fetching weather data")
+print("Fetching weather data...")
 
 # this one is done, gets todays weather and the next 7 days forecast in seperate DFs
 
@@ -18,7 +19,6 @@ def get_weather_data():
     response = requests.get(url)
     data = response.json()
 
-    print("Successfully received weather data")
     hourly_data = []
     for day in data.get("days", []):
         for hour in day.get("hours", []):
@@ -28,9 +28,11 @@ def get_weather_data():
 
     df = pd.DataFrame(hourly_data)
 
-    df["full_datetime"] = pd.to_datetime(df["date"] + " " + df["datetime"])
+    houston_tz = pytz.timezone('America/Chicago')
+
+    df["full_datetime"] = pd.to_datetime(df["date"] + " " + df["datetime"]).dt.tz_localize(houston_tz)
     # Get current time (in local time zone)
-    now = datetime.now()
+    now = datetime.now(houston_tz)
 
     # Split into past/current and forecast
     df_past = df[df["full_datetime"] <= now].copy()
@@ -49,8 +51,6 @@ def get_weather_data():
 df1,df2 = get_weather_data()
 
 print(df1.head(48))
-
 print(df2.tail(48))
 
 print("Finished weather data fetch")
-

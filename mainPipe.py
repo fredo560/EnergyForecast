@@ -26,7 +26,7 @@ def standardize_date_column(df):
     houston_tz = pytz.timezone('America/Chicago')
 
     df["date"] = pd.to_datetime(df["date"], errors="coerce",utc=True)  # convert to datetime, drop errors if any
-    df["date"] = df["date"].dt.tz_convert(houston_tz).dt.floor("h").dt.tz_localize(None)              # remove timezone                   # round to hour
+    df["date"] = df["date"].dt.tz_convert(houston_tz).dt.floor("h")         # remove timezone                   # round to hour
     return df
 
 for df in [df1, df2, df3, df4, df5, df6, df7, df8]:

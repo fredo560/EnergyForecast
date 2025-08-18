@@ -16,57 +16,38 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-          ref: ${{ github.ref }}
+          fetch-depth: 0               # get full history
+          ref: ${{ github.ref }}       # check out the branch that triggered workflow
 
-      - name: Set up cache paths and keys
-        id: vars
-        run: |
-          echo "ENV_DIR=C:\\Miniconda\\envs\\myenv" >> $GITHUB_ENV
-          echo "PKGS_DIR=C:\\Users\\runneradmin\\conda_pkgs_dir" >> $GITHUB_ENV
-          echo "ENV_KEY=${{ runner.os }}-conda-env-${{ hashFiles('environment.yml') }}" >> $GITHUB_ENV
-          echo "PKGS_KEY=${{ runner.os }}-conda-pkgs-${{ hashFiles('environment.yml') }}" >> $GITHUB_ENV
-
-      - name: Cache conda pkgs_dir
+      - name: Cache conda
         uses: actions/cache@v3
+        env:
+          # Increase this to reset cache even if environment.yml hasn’t changed
+          CACHE_NUMBER: 0
         with:
-          path: ${{ env.PKGS_DIR }}
-          key: ${{ env.PKGS_KEY }}
-
-      - name: Cache conda environment
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.ENV_DIR }}
-          key: ${{ env.ENV_KEY }}
+          path: C:\Users\runneradmin\conda_pkgs_dir
+          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: myenv
           environment-file: environment.yml
           channel-priority: strict
-          use-only-tar-bz2: true
+          use-only-tar-bz2: true # IMPORTANT for cache re-use!
           auto-update-conda: true
-          cache-environment: false # We're handling cache manually
 
-      - name: Create environment if not cached
+      - name: Run pipeline
         shell: bash -l {0}
         run: |
-          if [ ! -d "$ENV_DIR" ]; then
-            conda env create --prefix "$ENV_DIR" --file environment.yml
-          fi
+          conda activate myenv
+          python mainPipe.py
 
-      #- name: Run pipeline
-       # shell: bash -l {0}
-       # run: |
-        #  conda activate "$ENV_DIR"
-       #   python mainPipe.py
-
-      #- name: Commit and push CSVs
-      #  run: |
-       #   git config --global user.name "github-actions[bot]"
-       #   git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        #  git add *.csv
-         # git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
-        #  git push
-      #  env:
-       #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit and push CSVs
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add *.csv
+          git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

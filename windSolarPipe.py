@@ -1,8 +1,9 @@
 from gridstatusio import GridStatusClient
 import pandas as pd
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 import pytz
 import time
+from datetime import date
 
 # this one works and gets the day prior and up to the recent hour of today
 # and the next 7 days forecast
@@ -10,8 +11,10 @@ print("Fetching wind and solar data...")
 houston_tz = pytz.timezone('America/Chicago')
 
 def fetch_wind_solar():
-    start_date = str(date.today() - timedelta(days=1))
-    end_date = str(date.today() + timedelta(days=1))
+    houston_now = datetime.now(houston_tz)
+
+    start_date = str(houston_now.date() - timedelta(days=1))
+    end_date = str(houston_now.date() + timedelta(days=1))
 
 
     ''' Fetches SPP wind and solar forecast data for the given date range.
@@ -51,12 +54,14 @@ def fetch_wind_solar():
 def fetch_wind_solar_forecast(days_ahead=8):
     ''' Fetches SPP wind and solar forecast data for the next 8 days.
     '''
+    houston_now = datetime.now(houston_tz)
+
     client = GridStatusClient("8d79158749f44daba78482b30626f617")
-    endEndDate = date.today() + timedelta(days=days_ahead)
+    endEndDate = houston_now.date() + timedelta(days=days_ahead)
 
     df = client.get_dataset(
         dataset="spp_solar_and_wind_forecast_mid_term",
-        start=date.today(),
+        start=houston_now.date(),
         end=endEndDate,
         publish_time="latest",
         #timezone="market",

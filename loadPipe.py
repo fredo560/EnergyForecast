@@ -26,8 +26,8 @@ def getErcotLoadForecast():
     # Fetch data as pandas DataFrame
     df = client.get_dataset(
         dataset="ercot_load_forecast_by_weather_zone",
-        start=start_date.strftime("%Y-%m-%d"),
-        end=end_date.strftime("%Y-%m-%d"),
+        start=start_date,#.strftime("%Y-%m-%d"),
+        end=end_date,#.strftime("%Y-%m-%d"),
         publish_time="latest",
         #timezone="market",
     )
@@ -49,8 +49,8 @@ def getErcotLoadForecast():
     df1 = df[df["date"] <= now].copy()
     df2 = df[df["date"] > now].copy()
 
-    df1["date"] = df1["date"].dt.strftime('%Y-%m-%d %H:%M:%S')
-    df2["date"] = df2["date"].dt.strftime('%Y-%m-%d %H:%M:%S')
+    #df1["date"] = df1["date"].dt.strftime('%Y-%m-%d %H:%M:%S')
+    #df2["date"] = df2["date"].dt.strftime('%Y-%m-%d %H:%M:%S')
 
     return df1, df2
 

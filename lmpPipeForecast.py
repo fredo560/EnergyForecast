@@ -57,8 +57,8 @@ def fetch_lmp_prices():
     df2 = df_combined[df_combined["date"] > now].copy()
     
     # Format dates as strings
-    df1["date"] = df1["date"].dt.strftime('%Y-%m-%d %H:%M:%S')
-    df2["date"] = df2["date"].dt.strftime('%Y-%m-%d %H:%M:%S')
+    #df1["date"] = df1["date"].dt.strftime('%Y-%m-%d %H:%M:%S')
+    #df2["date"] = df2["date"].dt.strftime('%Y-%m-%d %H:%M:%S')
     
     return df1, df2
 

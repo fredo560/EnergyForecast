@@ -45,18 +45,18 @@ jobs:
           auto-update-conda: false
           auto-activate-base: false     # Avoid auto_activate_base warning
 
-      - name: Run pipeline
-        shell: bash -l {0}
-        run: |
-          conda activate myenv
-          python mainPipe.py
+#      - name: Run pipeline
+ #       shell: bash -l {0}
+  #      run: |
+   #       conda activate myenv
+    #      python mainPipe.py
 
-      - name: Commit and push CSVs
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add *.csv
-          git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Commit and push CSVs
+ #       run: |
+  #        git config --global user.name "github-actions[bot]"
+   #       git config --global user.email "github-actions[bot]@users.noreply.github.com"
+    #      git add *.csv
+     #     git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
+      #    git push
+       # env:
+        #  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

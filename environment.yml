@@ -10,7 +10,7 @@ dependencies:
   - pytz
   - yfinance
   - termcolor
-  - gridstatus=0.29.1
   - pip
   - pip:
+      - gridstatus==0.29.1
       - gridstatusio==0.5.6

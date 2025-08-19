@@ -4,50 +4,62 @@ on:
   schedule:
     - cron: '30 4 * * *'
   workflow_dispatch:
-
+  
+env:
+  CACHE_NUMBER: 0
+  
+permissions:
+  contents: write
+  
 jobs:
-  caching-example:
-    name: Caching
-    runs-on: windows-latest
-    permissions:
-      contents: write
+  build:
 
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            label: win-64
+            prefix: C:\Miniconda3\envs\myenv
+
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
+
+      - name: Setup Mambaforge
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0               # get full history
-          ref: ${{ github.ref }}       # check out the branch that triggered workflow
+            miniforge-variant: Mambaforge
+            miniforge-version: latest
+            activate-environment: myenv
+            use-mamba: true
 
-      - name: Cache conda
-        uses: actions/cache@v3
-        env:
-          # Increase this to reset cache even if environment.yml hasn’t changed
-          CACHE_NUMBER: 0
+      - name: Set cache date
+        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+      - uses: actions/cache@v2
         with:
-          path: C:\Users\runneradmin\conda_pkgs_dir
-          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
+          path: ${{ matrix.prefix }}
+          key: ${{ matrix.label }}-conda-${{ hashFiles('environment.yml') }}-${{ env.DATE }}-${{ env.CACHE_NUMBER }}
+        id: cache
 
-      - uses: conda-incubator/setup-miniconda@v3
-        with:
-          activate-environment: myenv
-          environment-file: environment.yml
-          channel-priority: strict
-          use-only-tar-bz2: true # IMPORTANT for cache re-use!
-          auto-update-conda: true
+      - name: Update environment
+        run: mamba env update -n my-env -f environment.yml
+        if: steps.cache.outputs.cache-hit != 'true'
 
-      - name: Run pipeline
-        shell: bash -l {0}
-        run: |
-          conda activate myenv
-          python mainPipe.py
 
-      - name: Commit and push CSVs
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add *.csv
-          git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Run pipeline
+      #  shell: bash -l {0}
+      #  run: |
+       #   conda activate myenv
+       #   python mainPipe.py
+
+    #  - name: Commit and push CSVs
+     #   run: |
+      #    git config --global user.name "github-actions[bot]"
+       #   git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      #    git add *.csv
+      #    git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
+      #    git push
+      #  env:
+       #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

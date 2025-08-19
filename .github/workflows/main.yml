@@ -39,7 +39,7 @@ jobs:
           environment-file: environment.yml
           channel-priority: strict
           use-only-tar-bz2: true        # Ensure cache compatibility
-          auto-update-conda: true
+          auto-update-conda: false
           auto-activate-base: false     # Avoid auto_activate_base warning
 
 #      - name: Run pipeline

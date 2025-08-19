@@ -1,16 +1,16 @@
 name: myenv
 channels:
   - conda-forge
-  - defaults
+
 dependencies:
   - python=3.11
-  - pandas=2.3.1
-  - numpy=2.3.2
-  - requests=2.32.4
+  - pandas
+  - numpy
+  - requests
   - pytz
+  - yfinance
+  - termcolor
+  - gridstatus=0.29.1
   - pip
   - pip:
-      - gridstatus==0.29.1
       - gridstatusio==0.5.6
-      - termcolor
-      - yfinance==0.2.65

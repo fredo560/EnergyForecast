@@ -16,38 +16,32 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0               # get full history
-          ref: ${{ github.ref }}       # check out the branch that triggered workflow
+          fetch-depth: 0               # Get full history
+          ref: ${{ github.ref }}       # Check out the branch that triggered workflow
 
-      - name: Cache conda
-        uses: actions/cache@v3
-        env:
-          # Increase this to reset cache even if environment.yml hasn’t changed
-          CACHE_NUMBER: 0
-        with:
-          path: C:\Users\runneradmin\conda_pkgs_dir
-          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment.yml') }}
-
-      - uses: conda-incubator/setup-miniconda@v3
+      - name: Set up Conda environment
+        uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: myenv
           environment-file: environment.yml
           channel-priority: strict
-          use-only-tar-bz2: true # IMPORTANT for cache re-use!
+          use-only-tar-bz2: true        # Ensure cache compatibility
           auto-update-conda: true
+          cache-env-key: ${{ runner.os }}-conda-env-${{ hashFiles('environment.yml') }}  # Cache Conda environment
+          cache-pkgs-key: ${{ runner.os }}-conda-pkgs-${{ hashFiles('environment.yml') }}  # Cache Conda packages
 
-      - name: Run pipeline
-        shell: bash -l {0}
-        run: |
-          conda activate myenv
-          python mainPipe.py
-
-      - name: Commit and push CSVs
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add *.csv
-          git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Run pipeline
+ #       shell: bash -l {0}
+  #      run: |
+   #       conda activate myenv
+    #      python mainPipe.py
+#
+ #     - name: Commit and push CSVs
+  #      run: |
+   #       git config --global user.name "github-actions[bot]"
+    #      git config --global user.email "github-actions[bot]@users.noreply.github.com"
+     #     git add *.csv
+      #    git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
+       #   git push
+        #env:
+         # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

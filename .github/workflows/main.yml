@@ -8,7 +8,7 @@ on:
     - cron: '30 4 * * *'
   # Allows you to manually trigger the workflow
   workflow_dispatch:
-  
+
 # Gives the workflow write permissions to the repository content
 permissions:
   contents: write
@@ -29,11 +29,12 @@ jobs:
       # Step 2: Set up Mambaforge with built-in caching
       # The 'cache-environment' and 'cache-pkgs' flags handle the caching automatically.
       # This is the most reliable and efficient way to cache with this action.
+      # Use a specific version to avoid transient errors with "latest"
       - name: Setup Mambaforge
-        uses: conda-incubator/setup-miniconda@v3
+        uses: conda-incubator/setup-miniconda@v4
         with:
           miniforge-variant: Mambaforge
-          miniforge-version: latest
+          miniforge-version: "24.1.2-0"
           use-mamba: true
           activate-environment: myenv
           environment-file: environment.yml
@@ -43,19 +44,18 @@ jobs:
       # Step 3: Run your Python pipeline
       # Since 'setup-miniconda' activates the environment,
       # you don't need to explicitly call 'conda activate'.
-     # - name: Run pipeline
-      #  shell: bash -l {0}
+      #- name: Run pipeline
+       # shell: bash -l {0}
        # run: |
-        #  python mainPipe.py
+          python mainPipe.py
 
       # Step 4: Commit and push the generated CSV files
-     # - name: Commit and push CSVs
-       # run: |
-        #  git config --global user.name "github-actions[bot]"
-        #  git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        #  git add *.csv
-        #  git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
-        #  git push
-       # env:
+      #- name: Commit and push CSVs
+      #  run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add *.csv
+          git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
+          git push
+      #  env:
         #  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

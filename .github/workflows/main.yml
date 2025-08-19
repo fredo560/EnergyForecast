@@ -1,65 +1,61 @@
+# Name of the workflow
 name: Daily Conda Job
 
+# Events that trigger the workflow
 on:
+  # Schedule a run daily at 4:30 AM UTC
   schedule:
     - cron: '30 4 * * *'
+  # Allows you to manually trigger the workflow
   workflow_dispatch:
   
-env:
-  CACHE_NUMBER: 0
-  
+# Gives the workflow write permissions to the repository content
 permissions:
   contents: write
-  
+
+# Defines a single job in the workflow
 jobs:
   build:
+    name: Build and Run
+    # The type of runner to use
+    runs-on: windows-latest
 
-    strategy:
-      matrix:
-        include:
-          - os: windows-latest
-            label: win-64
-            prefix: C:\Miniconda3\envs\myenv
-
-    name: ${{ matrix.label }}
-    runs-on: ${{ matrix.os }}
+    # Steps in the job
     steps:
-      - uses: actions/checkout@v2
+      # Step 1: Checkout the repository code using the latest version
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
+      # Step 2: Set up Mambaforge with built-in caching
+      # The 'cache-environment' and 'cache-pkgs' flags handle the caching automatically.
+      # This is the most reliable and efficient way to cache with this action.
       - name: Setup Mambaforge
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
-            miniforge-variant: Mambaforge
-            miniforge-version: latest
-            activate-environment: myenv
-            use-mamba: true
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          use-mamba: true
+          activate-environment: myenv
+          environment-file: environment.yml
+          cache-environment: true
+          cache-pkgs: true
 
-      - name: Set cache date
-        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
-
-      - uses: actions/cache@v2
-        with:
-          path: ${{ matrix.prefix }}
-          key: ${{ matrix.label }}-conda-${{ hashFiles('environment.yml') }}-${{ env.DATE }}-${{ env.CACHE_NUMBER }}
-        id: cache
-
-      - name: Update environment
-        run: mamba env update -n my-env -f environment.yml
-        if: steps.cache.outputs.cache-hit != 'true'
-
-
-      #- name: Run pipeline
+      # Step 3: Run your Python pipeline
+      # Since 'setup-miniconda' activates the environment,
+      # you don't need to explicitly call 'conda activate'.
+     # - name: Run pipeline
       #  shell: bash -l {0}
-      #  run: |
-       #   conda activate myenv
-       #   python mainPipe.py
+       # run: |
+        #  python mainPipe.py
 
-    #  - name: Commit and push CSVs
-     #   run: |
-      #    git config --global user.name "github-actions[bot]"
-       #   git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      #    git add *.csv
-      #    git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
-      #    git push
-      #  env:
-       #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Step 4: Commit and push the generated CSV files
+     # - name: Commit and push CSVs
+       # run: |
+        #  git config --global user.name "github-actions[bot]"
+        #  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        #  git add *.csv
+        #  git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
+        #  git push
+       # env:
+        #  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

@@ -13,4 +13,4 @@ dependencies:
       - gridstatus==0.29.1
       - gridstatusio==0.5.6
       - termcolor
-
+      - yfinance

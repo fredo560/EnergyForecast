@@ -19,6 +19,19 @@ jobs:
           fetch-depth: 0               # Get full history
           ref: ${{ github.ref }}       # Check out the branch that triggered workflow
 
+      - name: Cache Conda packages and environment
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\Users\runneradmin\conda_pkgs_dir
+            C:\Users\runneradmin\miniconda3\envs\myenv
+          key: ${{ runner.os }}-conda-${{ hashFiles('environment.yml') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-conda-
+        env:
+          # Bump this to invalidate cache manually if needed
+          CACHE_NUMBER: 0
+
       - name: Set up Conda environment
         uses: conda-incubator/setup-miniconda@v3
         with:
@@ -27,21 +40,20 @@ jobs:
           channel-priority: strict
           use-only-tar-bz2: true        # Ensure cache compatibility
           auto-update-conda: true
-          cache-env-key: ${{ runner.os }}-conda-env-${{ hashFiles('environment.yml') }}  # Cache Conda environment
-          cache-pkgs-key: ${{ runner.os }}-conda-pkgs-${{ hashFiles('environment.yml') }}  # Cache Conda packages
+          auto-activate-base: false     # Avoid auto_activate_base warning
 
 #      - name: Run pipeline
  #       shell: bash -l {0}
   #      run: |
    #       conda activate myenv
     #      python mainPipe.py
-#
- #     - name: Commit and push CSVs
-  #      run: |
-   #       git config --global user.name "github-actions[bot]"
-    #      git config --global user.email "github-actions[bot]@users.noreply.github.com"
-     #     git add *.csv
-      #    git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
-       #   git push
-        #env:
-         # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+#      - name: Commit and push CSVs
+ #       run: |
+  #        git config --global user.name "github-actions[bot]"
+   #       git config --global user.email "github-actions[bot]@users.noreply.github.com"
+    #      git add *.csv
+     #     git commit -m "Add generated CSVs [skip ci]" || echo "No changes to commit"
+      #    git push
+       # env:
+        #  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

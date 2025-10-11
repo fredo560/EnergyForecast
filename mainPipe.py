@@ -9,17 +9,27 @@ from gridstatusio import GridStatusClient
 import yfinance as yf
 import json
 import requests
+import os
 
 from loadPipe import getErcotLoadForecast
 from lmpPipeForecast import fetch_lmp_prices
 from windSolarPipe import fetch_windSolar_real_and_forecast
 from weatherPipe import get_weather_data 
 
+def log_message(msg):
+    """Append a timestamped message to pipeline_log.txt"""
+    timestamp = datetime.now(pytz.timezone('America/Chicago')).strftime("[%Y-%m-%d %H:%M:%S %Z]")
+    log_line = f"{timestamp} {msg}\n"
+    print(log_line.strip())  # print to console
+    with open("pipeline_log.txt", "a", encoding="utf-8") as f:
+        f.write(log_line)
+
 df1, df2 = getErcotLoadForecast()
 df3, df4 = fetch_lmp_prices()
 df5, df6 = fetch_windSolar_real_and_forecast()
 df7, df8 = get_weather_data()
 
+log_message("Data fetched successfully from all sources.")
 print("Data fetched successfully from all sources.")
 
 def standardize_date_column(df):
@@ -83,7 +93,50 @@ print_date_range(df_forecast, "df_forecast")
 print("df_past columns:",df_past.columns.tolist())
 print("df_forecast columns:",df_forecast.columns.tolist())
 
-# Save the dataframes to CSV files
-df_past.to_csv("df_past.csv", index=False)
-df_forecast.to_csv("df_forecast.csv", index=False)
-print("Data saved to df_past.csv and df_forecast.csv")
+# # Save the dataframes to CSV files
+# df_past.to_csv("df_past.csv", index=False)
+# df_forecast.to_csv("df_forecast.csv", index=False)
+# print("Data saved to df_past.csv and df_forecast.csv")
+
+# --- SAVE SECTION ---
+
+past_path = "df_past.csv"
+forecast_path = "df_forecast.csv"
+
+#  Append new past data
+if os.path.exists(past_path):
+    old_past = pd.read_csv(past_path)
+    old_past["date"] = pd.to_datetime(old_past["date"], errors="coerce")
+    combined = pd.concat([old_past, df_past], ignore_index=True)
+    combined = combined.drop_duplicates(subset=["date"]).sort_values("date")
+    combined.to_csv(past_path, index=False)
+    log_message(f" Appended new past data — total rows: {len(combined)}")
+else:
+    df_past.to_csv(past_path, index=False)
+    log_message(f" Created new {past_path} — rows: {len(df_past)}")
+
+#  Overwrite forecast only if new data is newer
+if os.path.exists(forecast_path):
+    existing_forecast = pd.read_csv(forecast_path, parse_dates=["date"])
+
+    # Determine the new forecast range
+    new_start = df_forecast["date"].min()
+    new_end = df_forecast["date"].max()
+
+    # Keep only old forecast data *before* the new forecast window
+    mask = existing_forecast["date"] < new_start
+    combined_forecast = pd.concat(
+        [existing_forecast.loc[mask], df_forecast], ignore_index=True
+    )
+
+    # Remove duplicates on 'date' (keep the newest forecast)
+    combined_forecast = combined_forecast.drop_duplicates(subset=["date"], keep="last")
+    combined_forecast = combined_forecast.sort_values("date").reset_index(drop=True)
+    log_message(f"Existing forecast CSV found — overwrote data from {new_start.date()} to {new_end.date()}.")
+else:
+    combined_forecast = df_forecast.copy()
+    log_message("No existing forecast CSV found — creating new file.")
+
+combined_forecast.to_csv(forecast_path, index=False)
+print(" df_forecast.csv updated.")
+log_message(" df_forecast.csv saved successfully.")

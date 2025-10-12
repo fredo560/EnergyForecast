@@ -16,17 +16,23 @@ from lmpPipeForecast import fetch_lmp_prices
 from windSolarPipe import fetch_windSolar_real_and_forecast
 from weatherPipe import get_weather_data 
 
-def log_message(msg):
-    """Append a timestamped message to pipeline_log.txt"""
-    timestamp = datetime.now(pytz.timezone('America/Chicago')).strftime("[%Y-%m-%d %H:%M:%S %Z]")
-    log_line = f"{timestamp} {msg}\n"
-    print(log_line.strip())  # print to console
+def log_message(message):
+    try:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+    except NameError:
+        base_dir = os.getcwd()
 
-    log_dir = os.path.dirname(os.path.abspath(__file__))
-    log_path = os.path.join(log_dir, "pipeline_log.txt")
-    
-    with open("pipeline_log.txt", "a", encoding="utf-8") as f:
-        f.write(log_line)
+    log_path = os.path.join(base_dir, "pipeline_log.txt")
+
+    # Timestamp (Houston time)
+    tz = pytz.timezone("America/Chicago")
+    timestamp = datetime.now(tz).strftime("[%Y-%m-%d %H:%M:%S %Z]")
+    log_entry = f"{timestamp} {message}\n"
+
+    # Print and save
+    print(log_entry.strip())
+    with open(log_path, "a", encoding="utf-8") as f:
+        f.write(log_entry)
 
 df1, df2 = getErcotLoadForecast()
 df3, df4 = fetch_lmp_prices()
@@ -139,5 +145,6 @@ else:
 combined_forecast.to_csv(forecast_path, index=False)
 print(" df_forecast.csv updated.")
 log_message(" df_forecast.csv saved successfully.")
+
 
 

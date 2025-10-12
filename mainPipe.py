@@ -72,6 +72,18 @@ df_forecast = df_forecast.sort_values("date").reset_index(drop=True)
 
 print("Data sorted by date.")
 
+def add_time_features(df):                               
+    df["year"] = df["date"].dt.year                  
+    df["month"] = df["date"].dt.month               
+    df["day"] = df["date"].dt.day                      
+    df["dayofweek"] = df["date"].dt.dayofweek            
+    df["hour"] = df["date"].dt.hour                       
+    df["is_weekend"] = (df["dayofweek"] >= 5).astype(int) 
+    return df
+
+df_past = add_time_features(df_past)                      
+df_forecast = add_time_features(df_forecast) 
+
 print("Past DataFrame:")
 print(df_past.head(24))
 print(df_past.tail(24))
@@ -145,6 +157,5 @@ else:
 combined_forecast.to_csv(forecast_path, index=False)
 print(" df_forecast.csv updated.")
 log_message(" df_forecast.csv saved successfully.")
-
 
 

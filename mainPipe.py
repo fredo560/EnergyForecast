@@ -21,6 +21,10 @@ def log_message(msg):
     timestamp = datetime.now(pytz.timezone('America/Chicago')).strftime("[%Y-%m-%d %H:%M:%S %Z]")
     log_line = f"{timestamp} {msg}\n"
     print(log_line.strip())  # print to console
+
+    log_dir = os.path.dirname(os.path.abspath(__file__))
+    log_path = os.path.join(log_dir, "pipeline_log.txt")
+    
     with open("pipeline_log.txt", "a", encoding="utf-8") as f:
         f.write(log_line)
 
@@ -140,3 +144,4 @@ else:
 combined_forecast.to_csv(forecast_path, index=False)
 print(" df_forecast.csv updated.")
 log_message(" df_forecast.csv saved successfully.")
+

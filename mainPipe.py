@@ -97,11 +97,6 @@ print_date_range(df_forecast, "df_forecast")
 print("df_past columns:",df_past.columns.tolist())
 print("df_forecast columns:",df_forecast.columns.tolist())
 
-# # Save the dataframes to CSV files
-# df_past.to_csv("df_past.csv", index=False)
-# df_forecast.to_csv("df_forecast.csv", index=False)
-# print("Data saved to df_past.csv and df_forecast.csv")
-
 # --- SAVE SECTION ---
 
 past_path = "df_past.csv"
@@ -144,4 +139,5 @@ else:
 combined_forecast.to_csv(forecast_path, index=False)
 print(" df_forecast.csv updated.")
 log_message(" df_forecast.csv saved successfully.")
+
 

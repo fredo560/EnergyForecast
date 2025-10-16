@@ -134,7 +134,7 @@ if os.path.exists(past_path):
     combined = pd.concat([old_past, df_past], ignore_index=True)
     combined = combined.drop_duplicates(subset=["date"]).sort_values("date")
     combined.to_csv(past_path, index=False)
-    log_message(f" Appended new past data — total rows: {len(combined)} - dates changed {df_past["date"].min().date()} to {df_past["date"].max().date()} ")
+    log_message(f" Appended new past data — total rows: {len(combined)} - dates changed {df_past['date'].min().date()} to {df_past['date'].max().date()} ")
 else:
     df_past.to_csv(past_path, index=False)
     log_message(f" Created new {past_path} — rows: {len(df_past)}")
@@ -164,6 +164,7 @@ else:
 combined_forecast.to_csv(forecast_path, index=False)
 print(" df_forecast.csv updated.")
 log_message(" df_forecast.csv saved successfully.")
+
 
 
 

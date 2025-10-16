@@ -22,17 +22,23 @@ def log_message(message):
     except NameError:
         base_dir = os.getcwd()
 
-    log_path = os.path.join(base_dir, "pipeline_log.txt")
+    log_path = os.path.join(base_dir, "pipeline_log.csv")
 
-    # Timestamp (Houston time)
+    # Timestamp in America/Chicago timezone
     tz = pytz.timezone("America/Chicago")
-    timestamp = datetime.now(tz).strftime("[%Y-%m-%d %H:%M:%S %Z]")
-    log_entry = f"{timestamp} {message}\n"
+    timestamp = datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S %Z")
 
-    # Print and save
-    print(log_entry.strip())
-    with open(log_path, "a", encoding="utf-8") as f:
-        f.write(log_entry)
+    # Print log entry
+    print(f"[{timestamp}] {message}")
+
+    # Write to CSV (append mode)
+    file_exists = os.path.exists(log_path)
+    with open(log_path, "a", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile)
+        # Add headers if the file is new
+        if not file_exists:
+            writer.writerow(["timestamp", "message"])
+        writer.writerow([timestamp, message])
 
 df1, df2 = getErcotLoadForecast()
 df3, df4 = fetch_lmp_prices()
@@ -157,5 +163,6 @@ else:
 combined_forecast.to_csv(forecast_path, index=False)
 print(" df_forecast.csv updated.")
 log_message(" df_forecast.csv saved successfully.")
+
 
 

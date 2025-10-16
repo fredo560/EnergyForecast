@@ -10,6 +10,7 @@ import yfinance as yf
 import json
 import requests
 import os
+import csv
 
 from loadPipe import getErcotLoadForecast
 from lmpPipeForecast import fetch_lmp_prices
@@ -163,6 +164,7 @@ else:
 combined_forecast.to_csv(forecast_path, index=False)
 print(" df_forecast.csv updated.")
 log_message(" df_forecast.csv saved successfully.")
+
 
 
 

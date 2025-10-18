@@ -27,7 +27,7 @@ def fetch_lmp_prices(days_back=1):
                 df_day.groupby("Time")["SPP"]
                 .mean()
                 .reset_index()
-                .rename(columns={"Time": "date", "SPP": "LMP"})
+                .rename(columns={"Time": "date", "SPP": "lmp"})
             )
             df_day["location"] = "HB_HOUSTON"
             past_data.append(df_day)
@@ -70,3 +70,4 @@ print("\nFuture LMP Prices:")
 print(df2.head(24))
 print(df2.tail(24))
 print("Data fetched successfully.")
+

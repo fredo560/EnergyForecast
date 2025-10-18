@@ -41,14 +41,14 @@ def fetch_lmp_prices(days_back=1):
     df2 = df2[df2["Location"] == "HB_HOUSTON"]
     df2["Time"] = pd.to_datetime(df2["Time"], utc=True).dt.tz_convert(houston_tz).dt.floor('h')
     df2 = df2.rename(columns={"Time": "date", "Location": "location", "SPP": "lmp"})
-    df2 = df2[["date", "location", "LMP"]]
+    df2 = df2[["date", "location", "lmp"]]
 
     # --- FORECAST ---
     df3 = iso.get_spp(date="latest", market="DAY_AHEAD_HOURLY", location_type="Trading Hub")
     df3 = df3[df3["Location"] == "HB_HOUSTON"]
     df3["Time"] = pd.to_datetime(df3["Time"], utc=True).dt.tz_convert(houston_tz).dt.floor('h')
     df3 = df3.rename(columns={"Time": "date", "Location": "location", "SPP": "lmp"})
-    df3 = df3[["date", "location", "LMP"]]
+    df3 = df3[["date", "location", "lmp"]]
 
     # --- COMBINE ---
     df_combined = pd.concat([df_past, df2, df3], ignore_index=True)
@@ -70,5 +70,6 @@ print("\nFuture LMP Prices:")
 print(df2.head(24))
 print(df2.tail(24))
 print("Data fetched successfully.")
+
 
 

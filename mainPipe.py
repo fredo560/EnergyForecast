@@ -13,11 +13,11 @@ import requests
 import os
 import csv
 
-try:
-    from tensorflow.keras.models import load_model
-except Exception:
-    from keras.models import load_model
-from sklearn.preprocessing import MinMaxScaler
+# try:
+#     from tensorflow.keras.models import load_model
+# except Exception:
+#     from keras.models import load_model
+# from sklearn.preprocessing import MinMaxScaler
 
 from loadPipe import getErcotLoadForecast
 from lmpPipeForecast import fetch_lmp_prices
@@ -173,75 +173,76 @@ combined_forecast.to_csv(forecast_path, index=False)
 print(" df_forecast.csv updated.")
 log_message(" df_forecast.csv saved successfully.")
 
-# --- LOAD MODEL AND PREDICT ---
+# # --- LOAD MODEL AND PREDICT ---
 
-# Load the saved model with proper path
-model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "best_lstm_energy_model2.h5")
-if not os.path.exists(model_path):
-    raise FileNotFoundError(f"Model file not found at {model_path}. Please ensure the model has been trained and saved.")
+# # Load the saved model with proper path
+# model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "best_lstm_energy_model2.h5")
+# if not os.path.exists(model_path):
+#     raise FileNotFoundError(f"Model file not found at {model_path}. Please ensure the model has been trained and saved.")
 
-try:
-    model = load_model(model_path, compile=False)  # Load without compiling to avoid metric issues
-    model.compile(loss='mse', metrics=['mae'])  # Recompile with the same loss and metrics used during training
-    print(f"Model loaded successfully from {model_path}")
-except Exception as e:
-    raise Exception(f"Failed to load model: {e}")
+# try:
+#     model = load_model(model_path, compile=False)  # Load without compiling to avoid metric issues
+#     model.compile(loss='mse', metrics=['mae'])  # Recompile with the same loss and metrics used during training
+#     print(f"Model loaded successfully from {model_path}")
+# except Exception as e:
+#     raise Exception(f"Failed to load model: {e}")
 
-# Define features used during training (based on your previous script)
-features = ['temp', 'dew', 'humidity', 'precip', 'snow', 'windspeed', 'sealevelpressure', 
-            'cloudcover', 'visibility', 'solarradiation', 'solarenergy', 'lmp', 'actual_wind_mw', 
-            'actual_solar_mw', 'year', 'month', 'day', 'dayofweek', 'hour', 'is_weekend', 
-            'is_hurricane', 'hour_sin']
+# # Define features used during training (based on your previous script)
+# features = ['temp', 'dew', 'humidity', 'precip', 'snow', 'windspeed', 'sealevelpressure', 
+#             'cloudcover', 'visibility', 'solarradiation', 'solarenergy', 'lmp', 'actual_wind_mw', 
+#             'actual_solar_mw', 'year', 'month', 'day', 'dayofweek', 'hour', 'is_weekend', 
+#             'is_hurricane', 'hour_sin']
 
-df_forecast.rename(columns={"pressure":"sealevelpressure","wind_forecast_mw":"actual_wind_mw","solar_forecast_mw":"actual_solar_mw"}, inplace=True)
-missing_cols = [col for col in features if col not in df_forecast.columns]
-if missing_cols:
-    if 'is_hurricane' in missing_cols:
-        df_forecast['is_hurricane'] = 0
-        missing_cols.remove('is_hurricane')
-    if missing_cols:
-        raise ValueError(f"Missing columns in df_forecast: {missing_cols}")
+# df_forecast.rename(columns={"pressure":"sealevelpressure","wind_forecast_mw":"actual_wind_mw","solar_forecast_mw":"actual_solar_mw"}, inplace=True)
+# missing_cols = [col for col in features if col not in df_forecast.columns]
+# if missing_cols:
+#     if 'is_hurricane' in missing_cols:
+#         df_forecast['is_hurricane'] = 0
+#         missing_cols.remove('is_hurricane')
+#     if missing_cols:
+#         raise ValueError(f"Missing columns in df_forecast: {missing_cols}")
 
-df_predict = df_forecast[features].copy()
+# df_predict = df_forecast[features].copy()
 
-scaler= MinMaxScaler()
-scaler.fit(pd.read_csv("df_past.csv")[features + ['coast']])
+# scaler= MinMaxScaler()
+# scaler.fit(pd.read_csv("df_past.csv")[features + ['coast']])
 
-predict_scaled = pd.DataFrame(scaler.transform(df_predict), index=df_predict.index,columns=features)
+# predict_scaled = pd.DataFrame(scaler.transform(df_predict), index=df_predict.index,columns=features)
 
-seq_length=24
-def create_sequences(data, seq_length=seq_length):
-    xs = []
-    for i in range(len(data) - seq_length + 1):
-        x = data.iloc[i:(i + seq_length)][features].values
-        xs.append(x)
-    return np.array(xs)
+# seq_length=24
+# def create_sequences(data, seq_length=seq_length):
+#     xs = []
+#     for i in range(len(data) - seq_length + 1):
+#         x = data.iloc[i:(i + seq_length)][features].values
+#         xs.append(x)
+#     return np.array(xs)
 
-X_predict = create_sequences(predict_scaled)
+# X_predict = create_sequences(predict_scaled)
 
-if len(X_predict) == 0:
-    raise ValueError("Insufficient data in df_forecast to create sequences. Ensure at least 24 hours of data.")
+# if len(X_predict) == 0:
+#     raise ValueError("Insufficient data in df_forecast to create sequences. Ensure at least 24 hours of data.")
     
-predictions_scaled = model.predict(X_predict,verbose=0).flatten()
+# predictions_scaled = model.predict(X_predict,verbose=0).flatten()
 
-dummy = np.zeros((len(predictions_scaled), len(features) + 1))
-dummy[:, -1] = predictions_scaled
-predictions = scaler.inverse_transform(dummy)[:, -1]
+# dummy = np.zeros((len(predictions_scaled), len(features) + 1))
+# dummy[:, -1] = predictions_scaled
+# predictions = scaler.inverse_transform(dummy)[:, -1]
 
-# Align predictions with dates (predictions correspond to the last timestep of each sequence)
-predict_dates = combined_forecast["date"].iloc[seq_length-1:].values[:len(predictions)]
+# # Align predictions with dates (predictions correspond to the last timestep of each sequence)
+# predict_dates = combined_forecast["date"].iloc[seq_length-1:].values[:len(predictions)]
 
-# Create a DataFrame with predictions
-df_predictions = pd.DataFrame({
-    'date': predict_dates,
-    'predicted_coast': predictions
-})
+# # Create a DataFrame with predictions
+# df_predictions = pd.DataFrame({
+#     'date': predict_dates,
+#     'predicted_coast': predictions
+# })
 
-print("Predictions for coast:")
-print(df_predictions.head())
-print(df_predictions.tail())
+# print("Predictions for coast:")
+# print(df_predictions.head())
+# print(df_predictions.tail())
 
-predictions_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coast_predictions.csv")
-df_predictions.to_csv(predictions_path, index=False)
-log_message(f"Coast predictions saved to {predictions_path}")
+# predictions_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coast_predictions.csv")
+# df_predictions.to_csv(predictions_path, index=False)
+# log_message(f"Coast predictions saved to {predictions_path}")
+
 

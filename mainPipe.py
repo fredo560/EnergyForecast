@@ -86,6 +86,7 @@ def add_time_features(df):
     df["dayofweek"] = df["date"].dt.dayofweek            
     df["hour"] = df["date"].dt.hour                       
     df["is_weekend"] = (df["dayofweek"] >= 5).astype(int) 
+    df["hour_sin"] = np.sin(2 * np.pi * df["hour"] / 24)
     return df
 
 df_past = add_time_features(df_past)                      
@@ -164,6 +165,7 @@ else:
 combined_forecast.to_csv(forecast_path, index=False)
 print(" df_forecast.csv updated.")
 log_message(" df_forecast.csv saved successfully.")
+
 
 
 

@@ -12,6 +12,12 @@ import requests
 import os
 import csv
 
+try:
+    from tensorflow.keras.models import load_model
+except Exception:
+    from keras.models import load_model
+from sklearn.preprocessing import MinMaxScaler
+
 from loadPipe import getErcotLoadForecast
 from lmpPipeForecast import fetch_lmp_prices
 from windSolarPipe import fetch_windSolar_real_and_forecast
@@ -165,6 +171,7 @@ else:
 combined_forecast.to_csv(forecast_path, index=False)
 print(" df_forecast.csv updated.")
 log_message(" df_forecast.csv saved successfully.")
+
 
 
 

@@ -10,7 +10,9 @@ dependencies:
   - pytz
   - yfinance
   - termcolor
+  - scikit-learn
   - pip
   - pip:
+      - tensorflow
       - gridstatus==0.29.1
       - gridstatusio==0.5.6

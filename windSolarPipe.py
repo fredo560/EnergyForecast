@@ -69,6 +69,7 @@ def fetch_wind_solar_forecast(days_ahead=8):
         )
 
     df['date'] = pd.to_datetime(df['interval_start_utc'],utc=True).dt.tz_convert(houston_tz).dt.floor("h")#.dt.tz_localize(None).dt.strftime('%Y-%m-%d %H:%M:%S')
+    df = df.sort_values('date').drop_duplicates(subset=['date'], keep='first')
     df = df[['date', 'wind_forecast_mw', 'solar_forecast_mw']]
     df = df.dropna()
     return df

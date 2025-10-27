@@ -8,7 +8,8 @@ from datetime import date
 # this one works and gets the day prior and up to the recent hour of today
 # and the next 7 days forecast
 print("Fetching wind and solar data...")
-houston_tz = pytz.timezone('America/Chicago')
+#houston_tz = pytz.timezone('America/Chicago')
+houston_tz = pytz.timezone('Etc/GMT+5') 
 
 def fetch_wind_solar():
     houston_now = datetime.now(houston_tz)
@@ -32,7 +33,7 @@ def fetch_wind_solar():
     )
     print(df.head(24))
     print(df.columns)
-    df['datetime'] = pd.to_datetime(df['interval_start_utc'],utc=True).dt.tz_convert(houston_tz,ambiguous=True) #.dt.tz_localize(None)  # Convert to Houston local time
+    df['datetime'] = pd.to_datetime(df['interval_start_utc'],utc=True).dt.tz_convert(houston_tz) #.dt.tz_localize(None)  # Convert to Houston local time
     df["date"] = df["datetime"].dt.floor("h")
 
     # Group by hour and calculate averages
@@ -67,7 +68,7 @@ def fetch_wind_solar_forecast(days_ahead=8):
         #timezone="market",
         )
 
-    df['date'] = pd.to_datetime(df['interval_start_utc'],utc=True).dt.tz_convert(houston_tz, ambiguous=True).dt.floor("h")#.dt.tz_localize(None).dt.strftime('%Y-%m-%d %H:%M:%S')
+    df['date'] = pd.to_datetime(df['interval_start_utc'],utc=True).dt.tz_convert(houston_tz).dt.floor("h")#.dt.tz_localize(None).dt.strftime('%Y-%m-%d %H:%M:%S')
     df = df[['date', 'wind_forecast_mw', 'solar_forecast_mw']]
     df = df.dropna()
     return df

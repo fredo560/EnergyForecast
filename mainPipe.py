@@ -59,10 +59,14 @@ print("Data fetched successfully from all sources.")
 def standardize_date_column(df):
     houston_tz = pytz.timezone('Etc/GMT+5')
 
-    df["date"] = pd.to_datetime(df["date"], errors="coerce",utc=True)  # convert to datetime, drop errors if any
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+
+    # Localize only if datetime is naive (no tz info)
     if df["date"].dt.tz is None:
         df["date"] = df["date"].dt.tz_localize("UTC", ambiguous="NaT", nonexistent="shift_forward")
-    df["date"] = df["date"].dt.tz_convert(houston_tz).dt.floor("h")         # remove timezone                   # round to hour
+
+    # Convert to Houston time and round to hour
+    df["date"] = df["date"].dt.tz_convert(houston_tz).dt.floor("h")
     return df
 
 for df in [df1, df2, df3, df4, df5, df6, df7, df8]:
@@ -246,6 +250,7 @@ log_message(" df_forecast.csv saved successfully.")
 # predictions_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coast_predictions.csv")
 # df_predictions.to_csv(predictions_path, index=False)
 # log_message(f"Coast predictions saved to {predictions_path}")
+
 
 
 

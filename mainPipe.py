@@ -57,7 +57,7 @@ log_message("Data fetched successfully from all sources.")
 print("Data fetched successfully from all sources.")
 
 def standardize_date_column(df):
-    houston_tz = pytz.timezone('America/Chicago')
+    houston_tz = pytz.timezone('Etc/GMT+5')
 
     df["date"] = pd.to_datetime(df["date"], errors="coerce",utc=True)  # convert to datetime, drop errors if any
     if df["date"].dt.tz is None:
@@ -246,6 +246,7 @@ log_message(" df_forecast.csv saved successfully.")
 # predictions_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coast_predictions.csv")
 # df_predictions.to_csv(predictions_path, index=False)
 # log_message(f"Coast predictions saved to {predictions_path}")
+
 
 
 

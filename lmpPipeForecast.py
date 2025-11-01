@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import pytz
 
 iso = gridstatus.Ercot()
-houston_tz = pytz.timezone('America/Chicago')
+houston_tz = pytz.FixedOffset(-300)
 
 def fetch_lmp_prices(days_back=1):
     now = datetime.now(houston_tz)
@@ -22,7 +22,7 @@ def fetch_lmp_prices(days_back=1):
                 location_type="Trading Hub"
             )
             df_day = df_day[df_day["Location"] == "HB_HOUSTON"]
-            df_day["Time"] = pd.to_datetime(df_day["Time"], utc=True).dt.tz_convert(houston_tz).dt.floor('h')
+            df_day["Time"] = pd.to_datetime(df_day["Time"], errors="coerce", utc=True).dt.tz_convert(houston_tz).dt.floor('h')
             df_day = (
                 df_day.groupby("Time")["SPP"]
                 .mean()
@@ -39,14 +39,14 @@ def fetch_lmp_prices(days_back=1):
     # --- DAY-AHEAD TODAY ---
     df2 = iso.get_spp(date=now, market="DAY_AHEAD_HOURLY", location_type="Trading Hub")
     df2 = df2[df2["Location"] == "HB_HOUSTON"]
-    df2["Time"] = pd.to_datetime(df2["Time"], utc=True).dt.tz_convert(houston_tz).dt.floor('h')
+    df2["Time"] = pd.to_datetime(df2["Time"], errors="coerce", utc=True).dt.tz_convert(houston_tz).dt.floor('h')
     df2 = df2.rename(columns={"Time": "date", "Location": "location", "SPP": "lmp"})
     df2 = df2[["date", "location", "lmp"]]
 
     # --- FORECAST ---
     df3 = iso.get_spp(date="latest", market="DAY_AHEAD_HOURLY", location_type="Trading Hub")
     df3 = df3[df3["Location"] == "HB_HOUSTON"]
-    df3["Time"] = pd.to_datetime(df3["Time"], utc=True).dt.tz_convert(houston_tz).dt.floor('h')
+    df3["Time"] = pd.to_datetime(df3["Time"],errors="coerce", utc=True).dt.tz_convert(houston_tz).dt.floor('h')
     df3 = df3.rename(columns={"Time": "date", "Location": "location", "SPP": "lmp"})
     df3 = df3[["date", "location", "lmp"]]
 
@@ -70,6 +70,7 @@ print("\nFuture LMP Prices:")
 print(df2.head(24))
 print(df2.tail(24))
 print("Data fetched successfully.")
+
 
 
 

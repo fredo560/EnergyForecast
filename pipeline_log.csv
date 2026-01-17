@@ -371,3 +371,7 @@
 2026-01-16 16:43:04 CST, Appended new past data — total rows: 74465 - dates changed 2026-01-15 to 2026-01-16 
 2026-01-16 16:43:04 CST,Existing forecast CSV found — overwrote data from 2026-01-16 to 2026-01-18.
 2026-01-16 16:43:04 CST, df_forecast.csv saved successfully.
+2026-01-17 16:41:37 CST,Data fetched successfully from all sources.
+2026-01-17 16:41:40 CST, Appended new past data — total rows: 74489 - dates changed 2026-01-16 to 2026-01-17 
+2026-01-17 16:41:40 CST,Existing forecast CSV found — overwrote data from 2026-01-17 to 2026-01-19.
+2026-01-17 16:41:40 CST, df_forecast.csv saved successfully.
